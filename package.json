@@ -1,0 +1,33 @@
+{
+  "name": "dyp-dpu-admission-backend",
+  "version": "1.0.0",
+  "description": "The backend for the web app of DYPDPU's first year admission process for pharmacy and engineering",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch-path .",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrathameshGandule/dyp-dpu-admission-backend.git"
+  },
+  "keywords": [
+    "backend",
+    "admission"
+  ],
+  "author": "Prathamesh Gandule",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PrathameshGandule/dyp-dpu-admission-backend/issues"
+  },
+  "homepage": "https://github.com/PrathameshGandule/dyp-dpu-admission-backend#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1"
+  }
+}
