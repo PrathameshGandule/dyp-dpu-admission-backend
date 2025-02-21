@@ -11,6 +11,12 @@ connectDB();
 // using express json for handling body
 app.use(express.json());
 
+import authRoutes from "./routes/authRoutes.js"
+import gateRoutes from "./routes/gateRoutes.js"
+
+app.use('/api/auth', authRoutes);
+app.use('/api/gate', gateRoutes);
+
 app.get('/', (req, res) => {
     res.status(200).json({
         message: "Welcome message from base route"
