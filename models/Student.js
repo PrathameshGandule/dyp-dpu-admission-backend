@@ -1,22 +1,34 @@
 import { Schema, model } from "mongoose";
 
 const studentSchema = new Schema({
-    name: { type: String, required: true },
-    phoneNumber: { type: Number, required: true },
-    email: { type: String, required: true },
-    address: { type: String, required: true },
-    credentials10: {
-        boardName: { type: String, required: true },
-        marks: { type: Number, required: true },
+    firstname: { type: String, required: true },
+    middlename: { type: String, required: true },
+    lastname: { type: String, required: true },
+    phone: { type: String, required: true },
+    purpose: { type: String, enum: ["admission", "inquiry", "visit"] , required: true },
+    stream: { type: String, enum: ["eng", "mba", "pharma"], required: true },
+    desk1: {
+        counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
+        email: { type: String, default: null },
+        marks10: { type: Number, default: null },
+        marks12: { type: Number, default: null },
+        cet: { type: Number, default: null },
+        jee: { type: Number, default: null },
+        remarks: { type: String, default: "No remarks currently" }
     },
-    credentials12: {
-        boardName: { type: String, required: true },
-        marks: { type: Number, required: true },
+    desk2: {
+        counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
+        campusVisit: { type: Boolean, default: false },
+        cafeteriaVisit: { type: Boolean, default: false },
+        sportsFacilityVisit: { type: Boolean, default: false },
+        labVisit: { type: Boolean, default: false },
+        classroomVisit: { type: Boolean, default: false },
+        remarks: { type: String, default: "No remarks currently" }
     },
-    cetPercentile: { type: Number },
-    jeePercentile: { type: Number },
-    stream: { type: String, enum: ["comp", "mech", "civil", "instru", "electrical", "entc", "anr", 'it'], required: true },
-    allotedCounsellor: { type: Schema.Types.ObjectId, ref: "Counsellor" },
+    desk3: {
+        counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
+        remarks: { type: String, default: "No remarks currently" }
+    }
 }, { timestamps: true });
 
 export default model("Student", studentSchema);
