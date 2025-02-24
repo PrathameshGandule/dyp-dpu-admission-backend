@@ -10,7 +10,7 @@ const desk_auth_register = async(req, res) => {
     try{
         const { username, password , type } = req.body;
         if(!username || !password || !type){
-            return res.status(404).json({ message: "Fill all fields !" });
+            return res.status(400).json({ message: "Fill all fields !" });
         }
         const hashedPassword = await hash(password, 10);
         const newUser = new Counsellor({
@@ -30,7 +30,7 @@ const desk_auth_login = async(req, res) => {
     try{
         const { username, password } = req.body;
         if(!username || !password){
-            return res.status(404).json({ message: "Fill all fields !" });
+            return res.status(400).json({ message: "Fill all fields !" });
         }
 
         const user = await Counsellor.findOne({ username });
@@ -40,7 +40,7 @@ const desk_auth_login = async(req, res) => {
 
         const isMatch = await compare(password, user.password);
         if(!isMatch){
-            return res.status(400).json({ message: "Invalid Password !" });
+            return res.status(401).json({ message: "Invalid Password !" });
         }
 
         const token = sign(
@@ -56,7 +56,7 @@ const desk_auth_login = async(req, res) => {
             maxAge: 18 * 60 * 60 * 1000
         });
 
-        res.json({ message: "Login successfull" });
+        res.status(200).json({ message: "Login successfull" });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });

@@ -4,16 +4,16 @@ import Counsellor from "../models/Counsellor.js";
 const setStudent = async (req, res) => {
     try{
         const counsellorId = req.user.id;
-        const currrole = String(req.user.role);
-        if(!req.params.id){
-            return res.status(404).json({ message: "Please student Id in params" });
-        }
+        const current_role = String(req.user.role);
         const studentId = req.params.id;
         const stud = await Student.findById(studentId);
-        if(stud.desk_updates[currrole]?.counsellorId != null){
-            return res.status(404).json({ message: "This student is being attended by another counsellor" });
+        if(stud.desk_updates[current_role]?.counsellorId.toString() == counsellorId){
+            return res.status(400).json({ message: "Already assigned to you" })
         }
-        stud.desk_updates[currrole].counsellorId = counsellorId;
+        if(stud.desk_updates[current_role]?.counsellorId != null){
+            return res.status(403).json({ message: "This student is being attended by another counsellor" });
+        }
+        stud.desk_updates[current_role].counsellorId = counsellorId;
         await stud.save();
         return res.status(200).json({ message: "Student selected" });
     } catch(err) {
@@ -22,52 +22,77 @@ const setStudent = async (req, res) => {
     }
 }
 
-const updateDesk1 = async (req, res) => {
+const releaseStudent = async(req, res) => {
     try{
-        let { email, marks10, marks12, remarks } = req.body;
-        if(!email || !marks10 || !marks12 || !remarks){
-            return res.status(404).json({ message: "PLease fill required fields" });
-        }
-        email = String(email);
-        marks10 = parseFloat(marks10);
-        marks12 = parseFloat(marks12);
-        remarks = String(remarks);
-        const cet = req.body.cet ? String(req.body.cet) : null;
-        const jee = req.body.jee ? String(req.body.jee) : null;
-        
-        const studentId = req.params.id;
-        const existingCounsellorId = await Student.findById(studentId, 'desk_updates.desk1.counsellorId -_id');
-        if(existingCounsellorId === null){
-            return res.status(400).json({ message: "Select the student first" });
-        }
         const counsellorId = req.user.id;
-        const updatedStudent = await Student.findOneAndUpdate(
-            {
-                _id: studentId,
-                "desk_updates.desk1.counsellorId": counsellorId,
-            },
-            {
-                $set: {
-                    "desk_updates.desk1.email": email,
-                    "desk_updates.desk1.marks10": marks10,
-                    "desk_updates.desk1.marks12": marks12,
-                    "desk_updates.desk1.cet": cet,
-                    "desk_updates.desk1.jee": jee,
-                    "desk_updates.desk1.remarks": remarks,
-                }
-            },
-            { new: true } // Return updated document
-        );
-        
-        if (!updatedStudent) {
-            return res.status(403).json({ message: "This student is being attended by another counsellor or does not exist" });
+        const current_role = String(req.user.role);
+        const studentId = req.params.id;
+        const stud = await Student.findById(studentId);
+        if(stud.desk_updates[current_role]?.counsellorId == null){
+            return res.status(400).json({ message: "This student is not assigned to anybody" });
         }
-        return res.status(200).json({ message: "Desk1 info updated successfully" });
+        if(stud.desk_updates[current_role]?.counsellorId.toString() != counsellorId){
+            return res.status(403).json({ message: "You aren't allowed to release him/her" })
+        }
+        stud.desk_updates[current_role].counsellorId = null;
+        await stud.save();
+        return res.status(200).json({ message: "Student released" });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+const updateDesk1 = async (req, res) => {
+    try {
+        const { email, marks10, marks12, remarks } = req.body;
+
+        // Fix: Ensure fields are explicitly checked for null/undefined
+        if (email == null || marks10 == null || marks12 == null || remarks == null) {
+            return res.status(400).json({ message: "Please fill required fields" });
+        }
+
+        // Fix: Avoid reassigning req.body variables
+        const studentEmail = String(email);
+        const studentMarks10 = parseFloat(marks10);
+        const studentMarks12 = parseFloat(marks12);
+        const studentRemarks = String(remarks);
+        const cet = req.body.cet ? String(req.body.cet) : null;
+        const jee = req.body.jee ? String(req.body.jee) : null;
+
+        const studentId = req.params.id;
+        const counsellorId = req.user.id;
+
+        const updatedStudent = await Student.findOneAndUpdate(
+            {
+                _id: studentId,
+                "desk_updates.desk1.counsellorId": counsellorId, // Ensures only the right counsellor updates
+            },
+            {
+                $set: {
+                    "desk_updates.desk1.email": studentEmail,
+                    "desk_updates.desk1.marks10": studentMarks10,
+                    "desk_updates.desk1.marks12": studentMarks12,
+                    "desk_updates.desk1.cet": cet,
+                    "desk_updates.desk1.jee": jee,
+                    "desk_updates.desk1.remarks": studentRemarks,
+                }
+            },
+            { new: true } // Return updated document
+        );
+
+        // Fix: Return 404 instead of 403 for missing student
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found or being attended by another counsellor" });
+        }
+
+        return res.status(200).json({ message: "Desk1 info updated successfully" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 
 const updateDesk2 = async(req, res) => {
     try{
@@ -107,6 +132,39 @@ const updateDesk2 = async(req, res) => {
     }
 }
 
-const updateDesk3 = async(req, res) => {}
 
-export { setStudent , updateDesk1 , updateDesk2 };
+
+const updateDesk3 = async(req, res) => {
+    try{
+        const { topic, remarks } = req.body;
+        if(!topic || !remarks){
+            return res.status(400).json({ message: "Please fill all required fields" });
+        }
+    
+        const studentId = req.params.id;
+        const counsellorId = req.user.id;   
+        
+        const updatedStudent = await Student.findOneAndUpdate(
+        {
+            _id: studentId,
+            "desk_updates.desk3.counsellorId": counsellorId,
+        },
+        {
+            $set: {
+                "desk_updates.desk3.counsellorId": counsellorId,
+                "desk_updates.desk3.topic": topic,
+                "desk_updates.desk3.remarks": remarks,
+            }
+        }
+        );
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "This student is being attended by another counsellor or does not exist" });
+        }
+        return res.status(200).json({ message: "Desk3 info updated successfully" });
+    } catch(err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export { setStudent , releaseStudent , updateDesk1 , updateDesk2 , updateDesk3 };
