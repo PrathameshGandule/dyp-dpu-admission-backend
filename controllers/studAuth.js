@@ -1,10 +1,5 @@
-import jpkg from "jsonwebtoken";
-import bpkg from "bcryptjs";
 import Student from "../models/Student.js";
 import getNextStudId from "../utils/generateId.js";
-
-const { sign } = jpkg;
-const { hash , compare } = bpkg;
 
 const gate_form = async(req, res) => {
     try{

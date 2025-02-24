@@ -1,6 +1,7 @@
 import jpkg from "jsonwebtoken";
 import bpkg from "bcryptjs";
 import Counsellor from "../models/Counsellor.js"
+import cookieParser from "cookie-parser";
 
 const { sign } = jpkg;
 const { hash , compare } = bpkg;
@@ -45,13 +46,17 @@ const desk_auth_login = async(req, res) => {
         const token = sign(
             { id: user._id, role: user.type },
             process.env.JWT_SECRET,
-            { expiresIn: "30d" }
+            { expiresIn: "18h" }
         );
 
-        return res.status(200).json({
-            message: "Login successfull",
-            token
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "Strict",
+            maxAge: 18 * 60 * 60 * 1000
         });
+
+        res.json({ message: "Login successfull" });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
