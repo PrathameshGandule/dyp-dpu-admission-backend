@@ -7,6 +7,10 @@ const gate_form = async(req, res) => {
         if(!firstname || !middlename || !lastname || !phone || !purpose || !stream){
             return res.status(400).json({ message: "Fill all required fields !" });
         }
+        const doesStudentExist = await Student.findOne({ phone });
+        if(doesStudentExist){
+            return res.status(400).json({ message: `Student with phone number ${phone} already exists` });
+        };
         const studId = await getNextStudId();
         const newStudent = new Student({
             studId,
