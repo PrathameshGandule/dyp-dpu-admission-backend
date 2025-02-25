@@ -1,7 +1,6 @@
 import jpkg from "jsonwebtoken";
 import bpkg from "bcryptjs";
 import Counsellor from "../models/Counsellor.js"
-import cookieParser from "cookie-parser";
 
 const { sign } = jpkg;
 const { hash , compare } = bpkg;
