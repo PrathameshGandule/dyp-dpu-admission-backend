@@ -2,42 +2,71 @@ import Student from "../models/Student.js";
 import Counsellor from "../models/Counsellor.js";
 
 const setStudent = async (req, res) => {
-    try{
+    try {
         const counsellorId = req.user.id;
         const current_role = String(req.user.role);
         const studentId = req.params.id;
         const stud = await Student.findById(studentId);
-        if(stud.desk_updates[current_role]?.counsellorId.toString() == counsellorId){
+        if (!stud) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+        if (stud.desk_updates[current_role]?.counsellorId.toString() == counsellorId) {
             return res.status(400).json({ message: "Already assigned to you" })
         }
-        if(stud.desk_updates[current_role]?.counsellorId != null){
+        if (stud.desk_updates[current_role]?.counsellorId != null) {
             return res.status(403).json({ message: "This student is being attended by another counsellor" });
         }
         stud.desk_updates[current_role].counsellorId = counsellorId;
         await stud.save();
         return res.status(200).json({ message: "Student selected" });
-    } catch(err) {
+    } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-const releaseStudent = async(req, res) => {
-    try{
+const releaseStudent = async (req, res) => {
+    try {
         const counsellorId = req.user.id;
         const current_role = String(req.user.role);
         const studentId = req.params.id;
         const stud = await Student.findById(studentId);
-        if(stud.desk_updates[current_role]?.counsellorId == null){
+        if (!stud) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+        if (stud.desk_updates[current_role]?.counsellorId == null) {
             return res.status(400).json({ message: "This student is not assigned to anybody" });
         }
-        if(stud.desk_updates[current_role]?.counsellorId.toString() != counsellorId){
-            return res.status(403).json({ message: "You aren't allowed to release him/her" })
+        if (stud.desk_updates[current_role]?.counsellorId.toString() != counsellorId) {
+            return res.status(403).json({ message: "You aren't allowed to release this student" })
         }
         stud.desk_updates[current_role].counsellorId = null;
         await stud.save();
         return res.status(200).json({ message: "Student released" });
-    } catch(err) {
+    } catch (err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const getDeskNullStudents = async (req, res) => {
+    try{
+        const current_role = req.user.role;
+        let null_students_field_path = `desk_updates.${current_role}.counsellorId`;
+        const students = await Student.find( { [null_students_field_path]: null } );
+        return res.status(200).json(students);    
+    } catch (err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const getStudentById = async (req, res) => {
+    try{
+        let studentId = req.params.id;
+        const stud = await Student.findById(studentId);
+        return res.status(200).json(stud);    
+    } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -94,8 +123,8 @@ const updateDesk1 = async (req, res) => {
 };
 
 
-const updateDesk2 = async(req, res) => {
-    try{
+const updateDesk2 = async (req, res) => {
+    try {
         const campusVisit = Boolean(req.body.campusVisit || false);
         const cafeteriaVisit = Boolean(req.body.cafeteriaVisit || false)
         const sportsFacilityVisit = Boolean(req.body.sportsFacilityVisit || false);
@@ -115,7 +144,7 @@ const updateDesk2 = async(req, res) => {
                     "desk_updates.desk2.campusVisit": campusVisit,
                     "desk_updates.desk2.cafeteriaVisit": cafeteriaVisit,
                     "desk_updates.desk2.sportsFacilityVisit": sportsFacilityVisit,
-                    "desk_updates.desk2.labVisit":labVisit,
+                    "desk_updates.desk2.labVisit": labVisit,
                     "desk_updates.desk2.classroomVisit": classroomVisit,
                     "desk_updates.desk2.remarks": remarks,
                 }
@@ -126,7 +155,7 @@ const updateDesk2 = async(req, res) => {
             return res.status(403).json({ message: "This student is being attended by another counsellor or does not exist" });
         }
         return res.status(200).json({ message: "Desk2 info updated successfully" });
-    } catch(err) {
+    } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -134,37 +163,37 @@ const updateDesk2 = async(req, res) => {
 
 
 
-const updateDesk3 = async(req, res) => {
-    try{
+const updateDesk3 = async (req, res) => {
+    try {
         const { topic, remarks } = req.body;
-        if(!topic || !remarks){
+        if (!topic || !remarks) {
             return res.status(400).json({ message: "Please fill all required fields" });
         }
-    
+
         const studentId = req.params.id;
-        const counsellorId = req.user.id;   
-        
+        const counsellorId = req.user.id;
+
         const updatedStudent = await Student.findOneAndUpdate(
-        {
-            _id: studentId,
-            "desk_updates.desk3.counsellorId": counsellorId,
-        },
-        {
-            $set: {
+            {
+                _id: studentId,
                 "desk_updates.desk3.counsellorId": counsellorId,
-                "desk_updates.desk3.topic": topic,
-                "desk_updates.desk3.remarks": remarks,
+            },
+            {
+                $set: {
+                    "desk_updates.desk3.counsellorId": counsellorId,
+                    "desk_updates.desk3.topic": topic,
+                    "desk_updates.desk3.remarks": remarks,
+                }
             }
-        }
         );
         if (!updatedStudent) {
             return res.status(404).json({ message: "This student is being attended by another counsellor or does not exist" });
         }
         return res.status(200).json({ message: "Desk3 info updated successfully" });
-    } catch(err) {
+    } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-export { setStudent , releaseStudent , updateDesk1 , updateDesk2 , updateDesk3 };
+export { setStudent, releaseStudent, getDeskNullStudents, updateDesk1, updateDesk2, updateDesk3 };
