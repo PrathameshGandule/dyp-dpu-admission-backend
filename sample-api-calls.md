@@ -1,10 +1,11 @@
 # /api/gate/form
 ```json
 {
-    "firstname": "pratham",
+    "firstname": "test",
     "middlename": "dhanaji",
     "lastname": "gandule",
     "phone": "5612324578",
+    "email": "prathameshgandule1@gmail.com",
     "purpose": "inquiry",
     "stream": "eng"
 }

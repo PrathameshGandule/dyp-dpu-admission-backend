@@ -6,6 +6,7 @@ const studentSchema = new Schema({
     middlename: { type: String, required: true },
     lastname: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     purpose: { type: String, enum: ["admission", "inquiry", "visit"] , required: true },
     stream: { type: String, enum: ["eng", "mba", "pharma"], required: true },
     desk_updates: {
