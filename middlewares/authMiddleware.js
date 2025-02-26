@@ -2,18 +2,27 @@ import jpkg from "jsonwebtoken";
 const { verify } = jpkg;
 
 const verifyToken = async (req, res, next) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
+    let token;
+    let authHeader = req.headers.authorization || req.headers.Authorization;
+    if(authHeader && authHeader.startsWith("Bearer")){
+        token = authHeader.split(" ")[1];
+        // if(!token){
+        //     return res.status(401).json({ message: "Access Denied" });
+        // }
+        try{
+            const decodedUser = verify(token, process.env.JWT_SECRET);
+            req.user = decodedUser;
+            // id
+            // role: user
+            // req.user.id
+            // req.user.role
+            next();
+        } catch(err) {
+            logd(err);
+            return res.status(401).json({ message: "Invalid Token" });
         }
-
-        const decoded = verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        logd(err);
-        return res.status(403).json({ message: "Forbidden" });
+    } else {
+        return res.status(401).json({ message: "No token, Access Denied" });
     }
 }
 
