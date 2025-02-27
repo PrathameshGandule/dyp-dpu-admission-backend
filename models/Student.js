@@ -9,6 +9,7 @@ const studentSchema = new Schema({
     email: { type: String, required: true, unique: true },
     purpose: { type: String, enum: ["admission", "inquiry", "visit"] , required: true },
     stream: { type: String, enum: ["eng", "mba", "pharma"], required: true },
+    currentDesk: { type: String, enum: ["desk1", "desk2", "desk3", "completed"], default: "desk1" },
     desk_updates: {
         desk1: {
             counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
