@@ -2,8 +2,10 @@ import jpkg from "jsonwebtoken";
 const { verify } = jpkg;
 
 const verifyToken = async (req, res, next) => {
+    console.log("Cookies:", req.cookies);
     try {
         const token = req.cookies.token;
+
         if (!token) {
             return res.status(401).json({ message: "Unauthorized" });
         }
@@ -18,6 +20,7 @@ const verifyToken = async (req, res, next) => {
 }
 
 const verifyGateLogin = (req, res, next) => {
+    console.log("User Data:", req.user);
     if(req.user.role === "gate"){
         next();
     } else {

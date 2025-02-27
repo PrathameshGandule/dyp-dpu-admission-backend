@@ -4,6 +4,7 @@ import ExpressMongoSanitize from "express-mongo-sanitize";
 import { configDotenv } from "dotenv"
 import connectDB from "./config/db.js"
 import './utils/logger.js'
+import cookieParser from "cookie-parser";
 
 // const { mongoSanitize } = ExpressMongoSanitize;
 
@@ -12,7 +13,12 @@ const app = express();
 const PORT = process.env.PORT || 5000
 connectDB();
 
-app.use(cors());
+
+app.use(cors({
+    origin: "http://localhost:5173",  // Allow only your frontend URL
+    credentials: true  // Allow cookies and authentication headers
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(ExpressMongoSanitize());
 

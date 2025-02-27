@@ -19,7 +19,7 @@ const gate_auth_register = async(req, res) => {
         await newUser.save();
         return res.status(201).json({ message: `Registration with username: ${username} successful !` });
     } catch(err) {
-        logd(err);        
+        console.error("Registration Error:", err);    
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
@@ -47,19 +47,19 @@ const gate_auth_login = async(req, res) => {
             { expiresIn: "30d" }
         );
 
-        // res.cookie("token", token, {
-        //     httpOnly: true,
-        //     secure: true,
-        //     sameSite: "Strict",
-        //     maxAge: 18 * 60 * 60 * 1000
-        // });
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "Lax",
+            maxAge: 18 * 60 * 60 * 1000
+        });
 
         res.status(200).json({
             message: "Login successfull",
             token
         });
     } catch(err) {
-        logd(err);
+        console.error("Login Error:", err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
