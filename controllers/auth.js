@@ -1,37 +1,38 @@
 import jpkg from "jsonwebtoken";
 import bpkg from "bcryptjs";
-import GateRegistration from "../models/GateRegistration.js";
+import CollegeAuthority from "../models/CollegeAuthority.js";
 
 const { sign } = jpkg;
 const { hash , compare } = bpkg;
 
-const gate_auth_register = async(req, res) => {
+const auth_register = async(req, res) => {
     try{
-        const { username, password } = req.body;
-        if(!username || !password){
+        const { username, password , type } = req.body;
+        if(!username || !password || !type){
             return res.status(400).json({ message: "Fill all fields !" });
         }
         const hashedPassword = await hash(password, 10);
-        const newUser = new GateRegistration({
+        const newUser = new CollegeAuthority({
             username, 
-            password: hashedPassword
+            password: hashedPassword,
+            type
         });
         await newUser.save();
-        return res.status(201).json({ message: `Registration with username: ${username} successful !` });
+        return res.status(200).json({ message: `Registration with username: ${username} and type ${type} successful !` });
     } catch(err) {
-        console.error("Registration Error:", err);    
+        logd(err);        
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-const gate_auth_login = async(req, res) => {
+const auth_login = async(req, res) => {
     try{
         const { username, password } = req.body;
         if(!username || !password){
             return res.status(400).json({ message: "Fill all fields !" });
         }
 
-        const user = await GateRegistration.findOne({ username });
+        const user = await CollegeAuthority.findOne({ username });
         if(!user){
             return res.status(404).json({ message: `User with username: ${username} not found !` });
         }
@@ -42,9 +43,9 @@ const gate_auth_login = async(req, res) => {
         }
 
         const token = sign(
-            { id: user._id, role: "gate" },
+            { id: user._id, role: user.type },
             process.env.JWT_SECRET,
-            { expiresIn: "30d" }
+            { expiresIn: "18h" }
         );
 
         res.cookie("token", token, {
@@ -56,12 +57,12 @@ const gate_auth_login = async(req, res) => {
 
         res.status(200).json({ message: "Login successfull", token });
     } catch(err) {
-        console.error("Login Error:", err);
+        logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
 export {
-    gate_auth_register,
-    gate_auth_login
+    auth_register,
+    auth_login
 };

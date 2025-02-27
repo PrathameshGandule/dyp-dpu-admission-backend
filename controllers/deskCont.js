@@ -1,5 +1,5 @@
 import Student from "../models/Student.js";
-import Counsellor from "../models/Counsellor.js";
+import Counsellor from "../models/CollegeAuthority.js";
 
 const setStudent = async (req, res) => {
     try {
