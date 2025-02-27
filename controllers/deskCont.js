@@ -74,15 +74,15 @@ const getStudentById = async (req, res) => {
 
 const updateDesk1 = async (req, res) => {
     try {
-        const { email, marks10, marks12, remarks } = req.body;
+        const { marks10, marks12, remarks } = req.body;
 
         // Fix: Ensure fields are explicitly checked for null/undefined
-        if (email == null || marks10 == null || marks12 == null || remarks == null) {
+        if (marks10 == null || marks12 == null || remarks == null) {
             return res.status(400).json({ message: "Please fill required fields" });
         }
 
         // Fix: Avoid reassigning req.body variables
-        const studentEmail = String(email);
+        // const studentEmail = String(email);
         const studentMarks10 = parseFloat(marks10);
         const studentMarks12 = parseFloat(marks12);
         const studentRemarks = String(remarks);
@@ -99,7 +99,6 @@ const updateDesk1 = async (req, res) => {
             },
             {
                 $set: {
-                    "desk_updates.desk1.email": studentEmail,
                     "desk_updates.desk1.marks10": studentMarks10,
                     "desk_updates.desk1.marks12": studentMarks12,
                     "desk_updates.desk1.cet": cet,
@@ -196,4 +195,4 @@ const updateDesk3 = async (req, res) => {
     }
 }
 
-export { setStudent, releaseStudent, getDeskNullStudents, updateDesk1, updateDesk2, updateDesk3 };
+export { setStudent, releaseStudent, getDeskNullStudents, getStudentById, updateDesk1, updateDesk2, updateDesk3 };
