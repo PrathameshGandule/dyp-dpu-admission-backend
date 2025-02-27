@@ -9,13 +9,14 @@ const gate_form = async(req, res) => {
             return res.status(400).json({ message: "Fill all required fields !" });
         }
 
-        const isEmailVerified = await redisClient.get(`email_verified:${email}`);
-        if (!isEmailVerified) return res.status(400).json({ message: "Email not verified. Please verify your email first." });
-
-        const doesStudentExist = await Student.findOne({ phone , email });
+        const doesStudentExist = await Student.findOne({ $or: [{ phone } , { email }] });
         if(doesStudentExist){
             return res.status(400).json({ message: `This student already exists` });
         };
+
+        const isEmailVerified = await redisClient.get(`email_verified:${email}`);
+        if (!isEmailVerified) return res.status(400).json({ message: "Email not verified. Please verify your email first." });
+
         const studId = await getNextStudId();
         const newStudent = new Student({
             studId,
