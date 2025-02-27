@@ -12,7 +12,6 @@ const studentSchema = new Schema({
     desk_updates: {
         desk1: {
             counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
-            email: { type: String, default: null },
             marks10: { type: Number, default: null },
             marks12: { type: Number, default: null },
             cet: { type: Number, default: null },
