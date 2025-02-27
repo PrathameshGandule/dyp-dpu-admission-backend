@@ -47,14 +47,14 @@ const gate_auth_login = async(req, res) => {
             { expiresIn: "30d" }
         );
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "Strict",
-            maxAge: 18 * 60 * 60 * 1000
-        });
+        // res.cookie("token", token, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     sameSite: "Strict",
+        //     maxAge: 18 * 60 * 60 * 1000
+        // });
 
-        res.status(200).json({ message: "Login successfull" });
+        res.status(200).json({ message: "Login successfull", token });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });

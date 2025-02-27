@@ -10,7 +10,7 @@ const setStudent = async (req, res) => {
         if (!stud) {
             return res.status(404).json({ message: "Student not found" });
         }
-        if (stud.desk_updates[current_role]?.counsellorId.toString() == counsellorId) {
+        if (stud.desk_updates[current_role]?.counsellorId == counsellorId) {
             return res.status(400).json({ message: "Already assigned to you" })
         }
         if (stud.desk_updates[current_role]?.counsellorId != null) {
@@ -63,8 +63,16 @@ const getDeskNullStudents = async (req, res) => {
 
 const getStudentById = async (req, res) => {
     try{
-        let studentId = req.params.id;
-        const stud = await Student.findById(studentId);
+        const studentId = req.params.id;
+        const current_role = req.user.role;
+        let stud;
+        if(current_role == "desk1"){
+            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 -_id");
+        } else if (current_role == "desk2"){
+            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2 -_id");
+        } else {
+            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2 desk_updates.desk3 -_id");
+        }
         return res.status(200).json(stud);    
     } catch (err) {
         logd(err);
@@ -74,10 +82,10 @@ const getStudentById = async (req, res) => {
 
 const updateDesk1 = async (req, res) => {
     try {
-        const { marks10, marks12, remarks } = req.body;
+        let { marks10, marks12, remarks , cet , jee } = req.body;
 
         // Fix: Ensure fields are explicitly checked for null/undefined
-        if (marks10 == null || marks12 == null || remarks == null) {
+        if (marks10 == null || marks12 == null || remarks == null || !(cet || jee)) {
             return res.status(400).json({ message: "Please fill required fields" });
         }
 
@@ -86,8 +94,8 @@ const updateDesk1 = async (req, res) => {
         const studentMarks10 = parseFloat(marks10);
         const studentMarks12 = parseFloat(marks12);
         const studentRemarks = String(remarks);
-        const cet = req.body.cet ? String(req.body.cet) : null;
-        const jee = req.body.jee ? String(req.body.jee) : null;
+        cet = req.body.cet ? String(req.body.cet) : null;
+        jee = req.body.jee ? String(req.body.jee) : null;
 
         const studentId = req.params.id;
         const counsellorId = req.user.id;
