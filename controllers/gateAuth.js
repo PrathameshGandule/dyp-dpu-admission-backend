@@ -50,14 +50,11 @@ const gate_auth_login = async(req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
-            sameSite: "Lax",
+            sameSite: "Strict",
             maxAge: 18 * 60 * 60 * 1000
         });
 
-        res.status(200).json({
-            message: "Login successfull",
-            token
-        });
+        res.status(200).json({ message: "Login successfull", token });
     } catch(err) {
         console.error("Login Error:", err);
         return res.status(500).json({ message: "Internal Server Error" });

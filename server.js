@@ -1,12 +1,11 @@
 import express from "express"
 import cors from "cors";
 import ExpressMongoSanitize from "express-mongo-sanitize";
+import cookieParser from "cookie-parser";
 import { configDotenv } from "dotenv"
 import connectDB from "./config/db.js"
 import './utils/logger.js'
-import cookieParser from "cookie-parser";
-
-// const { mongoSanitize } = ExpressMongoSanitize;
+// import cookieParser from "cookie-parser";
 
 configDotenv()
 const app = express();
@@ -21,6 +20,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use(ExpressMongoSanitize());
+app.use(cookieParser());
 
 import authRoutes from "./routes/authRoutes.js"
 import gateRoutes from "./routes/gateRoutes.js"
