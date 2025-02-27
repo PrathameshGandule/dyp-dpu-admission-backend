@@ -20,7 +20,7 @@
     "cet": 95.23
 }
 ```
-# /api/auth/desk/login
+# /api/auth/login
 ```json
 {
     "username": "desk2-mam-1",

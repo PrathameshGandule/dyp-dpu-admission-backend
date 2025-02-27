@@ -55,14 +55,30 @@ const auth_login = async(req, res) => {
             maxAge: 18 * 60 * 60 * 1000
         });
 
-        res.status(200).json({ message: "Login successfull", token });
+        res.status(200).json({ message: "Login successfull", role: user.type });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
+// use this whoami route to check what is role in current token
+const whoami = (req ,res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+        const decoded = verify(token, process.env.JWT_SECRET);
+        return res.status(200).json({ role: decoded.role });
+    } catch (err) {
+        logd(err);
+        return res.status(403).json({ message: "Forbidden" });
+    }
+}
+
 export {
     auth_register,
-    auth_login
+    auth_login,
+    whoami
 };
