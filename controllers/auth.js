@@ -55,13 +55,14 @@ const auth_login = async(req, res) => {
             maxAge: 18 * 60 * 60 * 1000
         });
 
-        res.status(200).json({ message: "Login successfull", role });
+        res.status(200).json({ message: "Login successfull", role: user.type });
     } catch(err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
+// use this whoami route to check what is role in current token
 const whoami = (req ,res) => {
     try {
         const token = req.cookies.token;
