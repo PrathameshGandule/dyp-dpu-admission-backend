@@ -107,6 +107,7 @@ const updateDesk1 = async (req, res) => {
             },
             {
                 $set: {
+                    currentDesk: "desk2",
                     "desk_updates.desk1.marks10": studentMarks10,
                     "desk_updates.desk1.marks12": studentMarks12,
                     "desk_updates.desk1.cet": cet,
@@ -148,6 +149,7 @@ const updateDesk2 = async (req, res) => {
             },
             {
                 $set: {
+                    currentDesk: "desk3",
                     "desk_updates.desk2.campusVisit": campusVisit,
                     "desk_updates.desk2.cafeteriaVisit": cafeteriaVisit,
                     "desk_updates.desk2.sportsFacilityVisit": sportsFacilityVisit,
@@ -187,6 +189,7 @@ const updateDesk3 = async (req, res) => {
             },
             {
                 $set: {
+                    currentDesk: "completed",
                     "desk_updates.desk3.counsellorId": counsellorId,
                     "desk_updates.desk3.topic": topic,
                     "desk_updates.desk3.remarks": remarks,
