@@ -19,10 +19,12 @@ app.use(cookieParser());
 import authRoutes from "./routes/authRoutes.js"
 import gateRoutes from "./routes/gateRoutes.js"
 import deskRoutes from "./routes/deskRoutes.js"
+import counterRoutes from "./routes/counterRoutes.js"
 
 app.use('/api/auth', authRoutes);
 app.use('/api/gate', gateRoutes);
 app.use('/api/desk', deskRoutes);
+app.use('/api', counterRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({
