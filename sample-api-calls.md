@@ -6,7 +6,8 @@
     "phone": "5612324578",
     "email": "abc@gmail.com",
     "purpose": "inquiry",
-    "stream": "eng"
+    "stream": "eng",
+    "visitors": "2"
 }
 ```
 # /api/desk/1/update/:id

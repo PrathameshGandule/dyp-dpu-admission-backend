@@ -4,7 +4,7 @@ import getNextStudId from "../utils/generateId.js";
 
 const gate_form = async(req, res) => {
     try{
-        const { firstname, lastname, phone, email, purpose, stream } = req.body;
+        const { firstname, lastname, phone, email, purpose, stream , visitors=0 } = req.body;
         if(!firstname || !lastname || !email || !phone || !purpose || !stream){
             return res.status(400).json({ message: "Fill all required fields !" });
         }
@@ -27,7 +27,8 @@ const gate_form = async(req, res) => {
             phone,
             email,
             purpose,
-            stream
+            stream,
+            visitors
         });
         newStudent.logs.push({ entryTime: new Date() });
         await newStudent.save();

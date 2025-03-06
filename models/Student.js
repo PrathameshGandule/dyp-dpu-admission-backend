@@ -9,6 +9,7 @@ const studentSchema = new Schema({
     purpose: { type: String, enum: ["admission", "inquiry", "visit"], required: true },
     stream: { type: String, enum: ["eng", "mba", "phr"], required: true },
     currentDesk: { type: String, enum: ["desk1", "desk2", "desk3", "completed"], default: "desk1" },
+    visitors: { type: String, default: 0 },
     logs: [{
         entryTime: { type: Date, required: true },
         exitTime: { type: Date, default: null }    
