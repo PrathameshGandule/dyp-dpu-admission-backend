@@ -2,7 +2,7 @@ import jpkg from "jsonwebtoken";
 import bpkg from "bcryptjs";
 import CollegeAuthority from "../models/CollegeAuthority.js";
 
-const { sign } = jpkg;
+const { sign, verify } = jpkg;
 const { hash , compare } = bpkg;
 
 const auth_register = async(req, res) => {
@@ -72,7 +72,7 @@ const whoami = (req ,res) => {
         const decoded = verify(token, process.env.JWT_SECRET);
         return res.status(200).json({ role: decoded.role });
     } catch (err) {
-        logd(err);
+       console.error(err)
         return res.status(403).json({ message: "Forbidden" });
     }
 }

@@ -1,5 +1,4 @@
 import Student from "../models/Student.js";
-import Counsellor from "../models/CollegeAuthority.js";
 
 const setStudent = async (req, res) => {
     try {
@@ -50,30 +49,40 @@ const releaseStudent = async (req, res) => {
 }
 
 const getDeskNullStudents = async (req, res) => {
-    try{
+    try {
         const current_role = req.user.role;
-        let null_students_field_path = `desk_updates.${current_role}.counsellorId`;
-        const students = await Student.find( { [null_students_field_path]: null } );
-        return res.status(200).json(students);    
+
+        // Validate role before querying
+        if (!["desk1", "desk2", "desk3"].includes(current_role)) {
+            return res.status(400).json({ message: "Invalid desk role" });
+        }
+
+        const students = await Student.find({
+            [`desk_updates.${current_role}.counsellorId`]: null,
+            currentDesk: current_role // Ensure students belong to the correct desk
+        });
+
+        return res.status(200).json(students);
     } catch (err) {
-        logd(err);
+        console.error("Error fetching students:", err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
+
 
 const getStudentById = async (req, res) => {
-    try{
+    try {
         const studentId = req.params.id;
         const current_role = req.user.role;
         let stud;
-        if(current_role == "desk1"){
+        if (current_role == "desk1") {
             stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 -_id");
-        } else if (current_role == "desk2"){
+        } else if (current_role == "desk2") {
             stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2 -_id");
         } else {
             stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2 desk_updates.desk3 -_id");
         }
-        return res.status(200).json(stud);    
+        return res.status(200).json(stud);
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -82,7 +91,7 @@ const getStudentById = async (req, res) => {
 
 const updateDesk1 = async (req, res) => {
     try {
-        let { marks10, marks12, remarks , cet , jee } = req.body;
+        let { marks10, marks12, remarks, cet, jee } = req.body;
 
         // Fix: Ensure fields are explicitly checked for null/undefined
         if (marks10 == null || marks12 == null || remarks == null || !(cet || jee)) {
@@ -103,7 +112,11 @@ const updateDesk1 = async (req, res) => {
         const updatedStudent = await Student.findOneAndUpdate(
             {
                 _id: studentId,
-                "desk_updates.desk1.counsellorId": counsellorId, // Ensures only the right counsellor updates
+                $or: [
+                    { "desk_updates.desk1.counsellorId": { $exists: false } }, // If missing, allow update
+                    { "desk_updates.desk1.counsellorId": null }, // If null, allow update
+                    { "desk_updates.desk1.counsellorId": counsellorId } // If already set to the correct ID, allow update
+                ]
             },
             {
                 $set: {
@@ -113,11 +126,12 @@ const updateDesk1 = async (req, res) => {
                     "desk_updates.desk1.cet": cet,
                     "desk_updates.desk1.jee": jee,
                     "desk_updates.desk1.remarks": studentRemarks,
+                    "desk_updates.desk1.counsellorId": counsellorId, // Now explicitly setting it
                 }
             },
-            { new: true } // Return updated document
+            { new: true }
         );
-
+        
         // Fix: Return 404 instead of 403 for missing student
         if (!updatedStudent) {
             return res.status(404).json({ message: "Student not found or being attended by another counsellor" });
