@@ -86,7 +86,6 @@ const updateDesk1 = async (req, res) => {
         const {
             fatherName,
             motherName,
-            gender,
             nationality,
             category,
             address,
@@ -129,7 +128,6 @@ const updateDesk1 = async (req, res) => {
         // Dynamically add only non-empty string fields.
         if (fatherName && fatherName.trim() !== "") updateFields["desk_updates.desk1.fatherName"] = fatherName;
         if (motherName && motherName.trim() !== "") updateFields["desk_updates.desk1.motherName"] = motherName;
-        if (gender && gender.trim() !== "") updateFields["desk_updates.desk1.gender"] = gender;
         if (nationality && nationality.trim() !== "") updateFields["desk_updates.desk1.nationality"] = nationality;
         if (category && category.trim() !== "") updateFields["desk_updates.desk1.category"] = category;
         if (address && address.trim() !== "") updateFields["desk_updates.desk1.address"] = address;
