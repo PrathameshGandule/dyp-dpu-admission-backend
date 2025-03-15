@@ -113,4 +113,18 @@ const entryWithId = async(req, res) => {
     }
 }
 
-export { gate_form , getBasicInfo , gate_exit , entryWithId };
+const whatIsMyStudId = async(req, res) => {
+    try{
+        let { email="" , phone="" } = req.body ?? {};
+        const studId = await Student.findOne({ $or: [{ phone } , { email }] }).select("studId -_id");
+        if(!studId){
+            return res.status(400).json({ message: `Student not found` });
+        }
+        res.status(200).json({ studId });
+    } catch(err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export { gate_form , getBasicInfo , gate_exit , entryWithId , whatIsMyStudId };
