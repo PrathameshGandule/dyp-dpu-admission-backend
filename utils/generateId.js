@@ -1,17 +1,17 @@
 import Counter from "../models/Counter.js";
 
-const getPrefix = () => {
+const getPrefix = (stream) => {
     const now = new Date();
     const month = now.toLocaleString("en-US", { month: "short" }).toUpperCase();
     const day = String(now.getDate()).padStart(2, "0");
     const year = now.getFullYear().toString().slice(2);
-    return `${day}${month}${year}`;
+    return `DYPDPU${stream.toUpperCase()}${day}${month}${year}`;
 }
 
-const getNextStudId = async () => {
-    const currentPrefix = getPrefix();
+const getNextStudId = async (stream) => {
+    const currentPrefix = getPrefix(stream);
     const counter = await Counter.findOneAndUpdate(
-        {}, // No need for `_id` since there's only one document
+        { counterId: stream }, // No need for `_id` since there's only one document
         { $inc: { sequence_value: 1 } },
         { new: true, upsert: true }
     );
