@@ -34,7 +34,7 @@ const gate_form = async (req, res) => {
         });
         newStudent.logs.push({ entryTime: new Date() });
         await newStudent.save();
-        return res.status(201).json({ message: "Student registered successfully !" });
+        return res.status(201).json({ message: "Student registered successfully !", studId });
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -116,7 +116,7 @@ const entryWithId = async (req, res) => {
 
 const whatIsMyStudId = async (req, res) => {
     try {
-        let { email=null, phone=null } = req.body ?? {};
+        let { email=null, phone=null } = req.query;
         const query = {};
         if (phone) query.phone = phone;
         if (email) query.email = email;
@@ -127,7 +127,7 @@ const whatIsMyStudId = async (req, res) => {
         if (!studId) {
             return res.status(400).json({ message: `Student not found` });
         }
-        res.status(200).json({ studId });
+        return res.status(200).json({ studId: studId.studId });
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });

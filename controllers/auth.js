@@ -77,8 +77,20 @@ const whoami = (req ,res) => {
     }
 }
 
+// Route: POST /api/logout
+const logout = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "Strict",
+        secure: process.env.NODE_ENV === "production"
+    });
+    return res.status(200).json({ message: "Logout successful" });
+};
+
+
 export {
     auth_register,
     auth_login,
-    whoami
+    whoami,
+    logout
 };

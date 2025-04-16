@@ -51,8 +51,17 @@ import Student from "../models/Student.js";
 const getDeskNullStudents = async (req, res) => {
     try {
         const current_role = req.user.role;
-        let null_students_field_path = `desk_updates.${current_role}.counsellorId`;
-        const students = await Student.find({ [null_students_field_path]: null });
+
+        // Validate role before querying
+        if (!["desk1", "desk2", "desk3"].includes(current_role)) {
+            return res.status(400).json({ message: "Invalid desk role" });
+        }
+
+        const students = await Student.find({
+            [`desk_updates.${current_role}.counsellorId`]: null,
+            currentDesk: current_role // Ensure students belong to the correct desk
+        });
+
         return res.status(200).json(students);
     } catch (err) {
         console.error("Error fetching students:", err);
@@ -67,11 +76,11 @@ const getStudentById = async (req, res) => {
         const current_role = req.user.role;
         let stud;
         if (current_role == "desk1") {
-            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1");
+            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1");
         } else if (current_role == "desk2") {
-            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2");
+            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1 desk_updates.desk2");
         } else {
-            stud = await Student.findById(studentId).select("studId firstname middlename lastname phone email purpose stream desk_updates.desk1 desk_updates.desk2 desk_updates.desk3");
+            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1 desk_updates.desk2 desk_updates.desk3");
         }
         return res.status(200).json(stud);
     } catch (err) {
