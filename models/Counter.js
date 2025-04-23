@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const counterSchema = new Schema({
-    counterId: { type: String, enum: ["eng", "mba", "phr"], default: "" },
+    counterId: { type: String, enum: ["eng", "mba", "phr", "libart"], default: "" },
     sequence_value: { type: Number, default: 0 }
 });
 
