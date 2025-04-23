@@ -53,7 +53,7 @@ const getDeskNullStudents = async (req, res) => {
         const current_role = req.user.role;
 
         // Validate role before querying
-        if (!["desk1", "desk2", "desk3"].includes(current_role)) {
+        if (!["desk1", "desk2", "desk3", "desk4"].includes(current_role)) {
             return res.status(400).json({ message: "Invalid desk role" });
         }
 
@@ -76,11 +76,13 @@ const getStudentById = async (req, res) => {
         const current_role = req.user.role;
         let stud;
         if (current_role == "desk1") {
-            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1");
+            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender");
         } else if (current_role == "desk2") {
-            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1 desk_updates.desk2");
+            stud = await Student.findById(studentId).select("desk_updates.desk1.remarks");
+        } else if (current_role == "desk3"){
+            stud = await Student.findById(studentId).select("desk_updates.desk1.remarks desk_updates.desk2.remarks");
         } else {
-            stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender desk_updates.desk1 desk_updates.desk2 desk_updates.desk3");
+            stud = await Student.findById(studentId);
         }
         return res.status(200).json(stud);
     } catch (err) {
@@ -106,22 +108,15 @@ const updateDesk1 = async (req, res) => {
             sscPercentage,
             hscBoard,
             hscYear,
-            hscPhysics,
-            hscChemistry,
-            hscMaths,
-            hscTotalMarks,
+            hscMarks,
+            hscOutOf,
             hscPercentage,
             jeeYear,
-            jeePercentage,
+            jeePercentile,
             cetYear,
-            cetPercentage,
+            cetPercentile,
             enrollmentId,
             branch,
-            campusVisit,
-            cafeteriaVisit,
-            sportsFacilityVisit,
-            labVisit,
-            classroomVisit,
             remarks,
         } = req.body ?? {};
 
@@ -148,26 +143,16 @@ const updateDesk1 = async (req, res) => {
         if (sscPercentage && sscPercentage.trim() !== "") updateFields["desk_updates.desk1.sscPercentage"] = sscPercentage;
         if (hscBoard && hscBoard.trim() !== "") updateFields["desk_updates.desk1.hscBoard"] = hscBoard;
         if (hscYear && hscYear.trim() !== "") updateFields["desk_updates.desk1.hscYear"] = hscYear;
-        if (hscPhysics && hscPhysics.trim() !== "") updateFields["desk_updates.desk1.hscPhysics"] = hscPhysics;
-        if (hscChemistry && hscChemistry.trim() !== "") updateFields["desk_updates.desk1.hscChemistry"] = hscChemistry;
-        if (hscMaths && hscMaths.trim() !== "") updateFields["desk_updates.desk1.hscMaths"] = hscMaths;
-        if (hscTotalMarks && hscTotalMarks.trim() !== "") updateFields["desk_updates.desk1.hscTotalMarks"] = hscTotalMarks;
+        if (hscMarks && hscMarks.trim() !== "") updateFields["desk_updates.desk1.hscMarks"] = hscMarks;
+        if (hscOutOf && hscOutOf.trim() !== "") updateFields["desk_updates.desk1.hscOutOf"] = hscOutOf;
         if (hscPercentage && hscPercentage.trim() !== "") updateFields["desk_updates.desk1.hscPercentage"] = hscPercentage;
         if (jeeYear && jeeYear.trim() !== "") updateFields["desk_updates.desk1.jeeYear"] = jeeYear;
-        if (jeePercentage && jeePercentage.trim() !== "") updateFields["desk_updates.desk1.jeePercentage"] = jeePercentage;
+        if (jeePercentile && jeePercentile.trim() !== "") updateFields["desk_updates.desk1.jeePercentile"] = jeePercentile;
         if (cetYear && cetYear.trim() !== "") updateFields["desk_updates.desk1.cetYear"] = cetYear;
-        if (cetPercentage && cetPercentage.trim() !== "") updateFields["desk_updates.desk1.cetPercentage"] = cetPercentage;
+        if (cetPercentile && cetPercentile.trim() !== "") updateFields["desk_updates.desk1.cetPercentile"] = cetPercentile;
         if (enrollmentId && enrollmentId.trim() !== "") updateFields["desk_updates.desk1.enrollmentId"] = enrollmentId;
         if (branch && branch.trim() !== "") updateFields["desk_updates.desk1.branch"] = branch;
         if (remarks && remarks.trim() !== "") updateFields["desk_updates.desk1.remarks"] = remarks;
-
-        // For boolean values (or numbers), you may want to explicitly check for undefined,
-        // because false is a valid value.
-        if (typeof campusVisit !== "undefined") updateFields["desk_updates.desk1.campusVisit"] = campusVisit;
-        if (typeof cafeteriaVisit !== "undefined") updateFields["desk_updates.desk1.cafeteriaVisit"] = cafeteriaVisit;
-        if (typeof sportsFacilityVisit !== "undefined") updateFields["desk_updates.desk1.sportsFacilityVisit"] = sportsFacilityVisit;
-        if (typeof labVisit !== "undefined") updateFields["desk_updates.desk1.labVisit"] = labVisit;
-        if (typeof classroomVisit !== "undefined") updateFields["desk_updates.desk1.classroomVisit"] = classroomVisit;
 
         const updatedStudent = await Student.findOneAndUpdate(
             { _id: studentId },
@@ -186,11 +171,16 @@ const updateDesk1 = async (req, res) => {
     }
 };
 
-
-
 const updateDesk2 = async (req, res) => {
     try {
-        let { topic, remarks } = req.body ?? {};
+        let {
+            campusVisit,
+            cafeteriaVisit,
+            sportsFacilityVisit,
+            labVisit,
+            classroomVisit,
+            remarks
+        } = req.body ?? {};
 
         const studentId = req.params.id;
         const counsellorId = req.user.id
@@ -200,7 +190,11 @@ const updateDesk2 = async (req, res) => {
             "desk_updates.desk2.counsellorId": counsellorId,
         }
 
-        if (topic && topic.trim() !== "") updateFields["desk_updates.desk2.topic"] = topic;
+        if (typeof campusVisit !== "undefined") updateFields["desk_updates.desk2.campusVisit"] = campusVisit;
+        if (typeof cafeteriaVisit !== "undefined") updateFields["desk_updates.desk2.cafeteriaVisit"] = cafeteriaVisit;
+        if (typeof sportsFacilityVisit !== "undefined") updateFields["desk_updates.desk2.sportsFacilityVisit"] = sportsFacilityVisit;
+        if (typeof labVisit !== "undefined") updateFields["desk_updates.desk2.labVisit"] = labVisit;
+        if (typeof classroomVisit !== "undefined") updateFields["desk_updates.desk2.classroomVisit"] = classroomVisit;
         if (remarks && remarks.trim() !== "") updateFields["desk_updates.desk2.remarks"] = remarks;
 
         const updatedStudent = await Student.findOneAndUpdate(
@@ -218,9 +212,37 @@ const updateDesk2 = async (req, res) => {
     }
 }
 
-
-
 const updateDesk3 = async (req, res) => {
+    try {
+        let { topic, remarks } = req.body ?? {};
+
+        const studentId = req.params.id;
+        const counsellorId = req.user.id
+
+        let updateFields = {
+            currentDesk: "desk4",
+            "desk_updates.desk3.counsellorId": counsellorId,
+        }
+
+        if (topic && topic.trim() !== "") updateFields["desk_updates.desk3.topic"] = topic;
+        if (remarks && remarks.trim() !== "") updateFields["desk_updates.desk3.remarks"] = remarks;
+
+        const updatedStudent = await Student.findOneAndUpdate(
+            { _id: studentId },
+            { $set: updateFields },
+            { new: true, projection: { _id: 1 } } // Return updated document
+        );
+        if (!updatedStudent) {
+            return res.status(403).json({ message: "This student does not exist" });
+        }
+        return res.status(200).json({ message: "Desk3 info updated successfully" });
+    } catch (err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const updateDesk4 = async (req, res) => {
     try {
         const {
             admissionStatus,
@@ -233,12 +255,12 @@ const updateDesk3 = async (req, res) => {
 
         let updateFields = {
             currentDesk: "completed",
-            "desk_updates.desk3.counsellorId": counsellorId,
+            "desk_updates.desk4.counsellorId": counsellorId,
         }
 
-        if (typeof admissionStatus !== "undefined") updateFields["desk_updates.desk3.admissionStatus"] = admissionStatus;
-        if (reason && reason.trim() !== "") updateFields["desk_updates.desk3.reason"] = reason;
-        if (remarks && remarks.trim() !== "") updateFields["desk_updates.desk3.remarks"] = remarks;
+        if (typeof admissionStatus !== "undefined") updateFields["desk_updates.desk4.admissionStatus"] = admissionStatus;
+        if (reason && reason.trim() !== "") updateFields["desk_updates.desk4.reason"] = reason;
+        if (remarks && remarks.trim() !== "") updateFields["desk_updates.desk4.remarks"] = remarks;
 
         const updatedStudent = await Student.findOneAndUpdate(
             { _id: studentId },
@@ -248,11 +270,11 @@ const updateDesk3 = async (req, res) => {
         if (!updatedStudent) {
             return res.status(404).json({ message: "This student does not exist" });
         }
-        return res.status(200).json({ message: "Desk3 info updated successfully" });
+        return res.status(200).json({ message: "Desk4 info updated successfully" });
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-export { getDeskNullStudents, getStudentById, updateDesk1, updateDesk2, updateDesk3 };
+export { getDeskNullStudents, getStudentById, updateDesk1, updateDesk2, updateDesk3, updateDesk4 };

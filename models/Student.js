@@ -44,6 +44,7 @@ const studentSchema = new Schema({
             remarks: { type: String, default: "No remarks currently" }
         },
         desk2: {
+            counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
             campusVisit: { type: Boolean, default: false },
             cafeteriaVisit: { type: Boolean, default: false },
             sportsFacilityVisit: { type: Boolean, default: false },
@@ -58,7 +59,7 @@ const studentSchema = new Schema({
         },
         desk4: {
             counsellorId: { type: Schema.Types.ObjectId, ref: "Counsellor", default: null },
-            admissionStatus: { type: Boolean, default: false },
+            admissionStatus: { type: String, default: "Nothing" },
             reason: { type: String, default: "" },
             remarks: { type: String, default: "No remarks currently" }
         }

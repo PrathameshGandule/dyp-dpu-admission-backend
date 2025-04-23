@@ -27,26 +27,28 @@
     "sscPercentage": "90",
     "hscBoard": "Maharashtra State Board",
     "hscYear": "2022",
-    "hscPhysics": "85",
-    "hscChemistry": "80",
-    "hscMaths": "90",
-    "hscTotalMarks": "255",
+    "hscMarks": "255",
+    "hscOutOf": "500",
     "hscPercentage": "85",
     "jeeYear": "2023",
-    "jeePercentage": "75",
+    "jeePercentile": "75",
     "cetYear": "2023",
-    "cetPercentage": "78",
+    "cetPercentile": "78",
     "enrollmentId": "EN24A1023",
     "branch": "Computer Science",
     "remarks": "Needs to submit documents",
+}
+// desk2
+{
     "campusVisit": true,
     "cafeteriaVisit": false,
     "sportsFacilityVisit": true,
     "labVisit": true,
-    "classroomVisit": true
+    "classroomVisit": true,
+    "remarks": "Good student"
 }
 ```
-# /api/auth/login
+# /api/auth/register
 ```json
 {
     "username": "desk1-1",

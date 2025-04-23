@@ -10,3 +10,14 @@
 9. upload images and essay route and access for webcam
 10. storage of images in buckets
 11. upgrade otp route to send otp through number
+
+# new changes to make
+
+- Interested course:  liberal arts
+- Student exit update, dropdown for current students that are inside the college instead of ID
+- Jee year freeze to current. Only overall percentage, not separate fo physics chem etc
+- Student campus visit details moved to desk 2
+- Admin panel for hod sir i.e desk 4
+- Desk 3
+- Header font metropolis black ( everywhere)
+- Who filled the details? Should be marked with the details.

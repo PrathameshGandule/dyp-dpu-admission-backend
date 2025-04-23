@@ -1,5 +1,6 @@
 import Student from "../models/Student.js";
 import getNextStudId from "../utils/generateId.js";
+import sendMail from "../utils/mailSender.js";
 // import redisClient from "../config/redis.js";
 
 const gate_form = async (req, res) => {
@@ -12,7 +13,7 @@ const gate_form = async (req, res) => {
         const doesStudentExist = await Student.findOne({ $or: [{ phone }, { email }] });
         if (doesStudentExist) {
             return res.status(400).json({ message: `This student already exists` });
-        } else if (stream != "eng" && stream != "mba" && stream != "phr") {
+        } else if (stream != "eng" && stream != "mba" && stream != "phr" && stream != "libart") {
             return res.status(400).json({ message: "Invalid stream" });
         }
 
@@ -34,6 +35,7 @@ const gate_form = async (req, res) => {
         });
         newStudent.logs.push({ entryTime: new Date() });
         await newStudent.save();
+        await sendMail(email, studId);
         return res.status(201).json({ message: "Student registered successfully !", studId });
     } catch (err) {
         logd(err);
@@ -43,14 +45,6 @@ const gate_form = async (req, res) => {
 
 const getBasicInfo = async (req, res) => {
     try {
-        // let { stream, lastNum } = req.body;
-        // if( stream==null || lastNum==null ){
-        //     return res.status(400).json({ message: "Please provide stream and last number from id" });
-        // } else if (stream != "eng" || stream != "mba" || stream != "phr"){
-        //     return res.status(400).json({ message: "Invalid stream" });
-        // }
-        // const prefix = getPrefix(stream);
-        // const suffix = String(lastNum).padStart(5, "0");
         let studId = req.params.studId;
         if (!studId) {
             return res.status(400).json({ message: "Please provide valid student id" });
@@ -68,19 +62,11 @@ const getBasicInfo = async (req, res) => {
 
 const gate_exit = async (req, res) => {
     try {
-        // let { stream, lastNum } = req.body;
-        // if( stream==null || lastNum==null ){
-        //     return res.status(400).json({ message: "Please provide stream and last number from id" });
-        // } else if (stream != "eng" || stream != "mba" || stream != "phr"){
-        //     return res.status(400).json({ message: "Invalid stream" });
-        // }
-        // const prefix = getPrefix(stream);
-        // const suffix = String(lastNum).padStart(5, "0");
         let studId = req.params.studId;
         if (!studId) {
             return res.status(400).json({ message: "Please provide valid student id" });
         }
-        const stud = await Student.findOne({ studId });
+        const stud = await Student.findOne({ studId }).select("logs -_id");
         if (!stud) {
             return res.status(404).json({ message: "Student not found" });
         }
@@ -101,9 +87,12 @@ const entryWithId = async (req, res) => {
         if (!studId) {
             return res.status(400).json({ message: "Please provide valid student id" });
         }
-        const stud = await Student.findOne({ studId });
+        const stud = await Student.findOne({ studId }).select("logs -_id");
         if (!stud) {
             return res.status(404).json({ message: "Student not found" });
+        }
+        if(stud.logs.at(-1).exitTime != null){
+            return res.status(400).json({ message: "First do an entry before exit" })
         }
         stud.logs.push({ entryTime: new Date() });
         await stud.save();
@@ -123,11 +112,11 @@ const whatIsMyStudId = async (req, res) => {
         if (!email && !phone) {
             return res.status(400).json({ message: "Provide atleast email or phone number" });
         }
-        const studId = await Student.findOne({ $or: [query] }).select("studId -_id");
-        if (!studId) {
+        const student = await Student.findOne({ $or: [query] }).select("studId -_id");
+        if (!student) {
             return res.status(400).json({ message: `Student not found` });
         }
-        return res.status(200).json({ studId: studId.studId });
+        return res.status(200).json({ studId: student.studId });
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
