@@ -34,7 +34,9 @@ let htmlTemplate = `<!DOCTYPE html>
           {{TOKEN_PLACEHOLDER}}
         </p>
 
-        <p style="margin-top:30px;">Please use this token to complete your verification or access campus systems.</p>
+        <p style="margin-top:30px;">Please use this token for further process</p>
+        <p>Now you may explore our campus</p>
+        <p>Or proceed towards counselling section</p>
         
         <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
 
