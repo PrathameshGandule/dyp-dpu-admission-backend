@@ -39,7 +39,7 @@ const studentSchema = new Schema({
             jeePercentile: { type: String, default: "" },
             cetYear: { type: String, default: "" },
             cetPercentile: { type: String, default: "" },
-            enrollmentId: { type: String, default: "EN24" },
+            enrollmentId: { type: String, default: "" },
             branch: { type: String, default: "" },
             remarks: { type: String, default: "No remarks currently" }
         },
