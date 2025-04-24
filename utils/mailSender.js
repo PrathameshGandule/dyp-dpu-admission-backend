@@ -13,9 +13,7 @@ const transporter = createTransport({
     },
 });
 
-htmlTemplate = 
-`
-<!DOCTYPE html>
+let htmlTemplate = `<!DOCTYPE html>
 <html>
   <body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#ffffff; color:#333;">
     <div style="max-width:600px; margin:0 auto; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
@@ -50,8 +48,7 @@ htmlTemplate =
       </div>
     </div>
   </body>
-</html>
-`
+</html>`
 
 const sendMail = async(recipient, token) => {
     const htmlContent = htmlTemplate.replace('{{TOKEN_PLACEHOLDER}}', token);
