@@ -37,7 +37,6 @@ const verifyToken = async (req, res, next) => {
 // };
 
 const verifyGateLogin = (req, res, next) => {
-   
     if(req.user.role === "gate"){
         next();
     } else {

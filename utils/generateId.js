@@ -12,9 +12,9 @@ const getPrefix = (stream) => {
 const getNextStudId = async (stream) => {
     const currentPrefix = getPrefix(stream);
     const counter = await Counter.findOneAndUpdate(
-        { counterId: stream }, // No need for `_id` since there's only one document
+        { counterId: stream },
         { $inc: { sequence_value: 1 } },
-        { new: true, upsert: true }
+        { new: true }
     );
     // made padstart to 4 for 4 digit unique numbers only
     let seq = String(counter.sequence_value).padStart(4, "0");

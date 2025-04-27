@@ -52,11 +52,11 @@ let htmlTemplate = `<!DOCTYPE html>
   </body>
 </html>`
 
-const sendMail = async(recipient, token) => {
+const sendWelcomeMail = async(email, token) => {
     const htmlContent = htmlTemplate.replace('{{TOKEN_PLACEHOLDER}}', token);
     const mailOptions = {
         from: process.env.USER_EMAIL,
-        to: recipient,
+        to: email,
         subject: "Welcome to DR. D. Y. PATIL DNYAN PRASAD UNIVERSITY, PUNE",
         html: htmlContent,
     };
@@ -67,4 +67,34 @@ const sendMail = async(recipient, token) => {
     });
 }
 
-export default sendMail;
+const sendRegistrationMail = async(name, email, type) => {
+    const mailOptions = {
+        from: process.env.USER_EMAIL,
+        to: email,
+        subject: "Your login credentials for DYPDPU counselling",
+        html: `Hello ${name}<br>
+                You've been assigned counselling type of ${type} at DYPDPU<br>
+                Go to login page and use forgot password to set your new password`,
+    };
+    transporter.sendMail(mailOptions, (err, info) => {
+        if(err) logd(err);
+        else logd("Email sent : ", info.response);
+    }); 
+}
+
+const sendOtpMail = async(email, otp) => {
+    const mailOptions = {
+        from: process.env.USER_EMAIL,
+        to: email,
+        subject: "Otp to set new password",
+        html: `Your otp to set new password is ${otp}<br>
+                You have 5 minutes to set new password`,
+    };
+    
+    transporter.sendMail(mailOptions, (err, info) => {
+        if(err) logd(err);
+        else logd("Email sent : ", info.response);
+    });
+}
+
+export { sendWelcomeMail, sendRegistrationMail, sendOtpMail };

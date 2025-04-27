@@ -1,6 +1,6 @@
 import Student from "../models/Student.js";
 import getNextStudId from "../utils/generateId.js";
-import sendMail from "../utils/mailSender.js";
+import { sendWelcomeMail } from "../utils/mailSender.js";
 // import redisClient from "../config/redis.js";
 
 const gate_form = async (req, res) => {
@@ -13,7 +13,7 @@ const gate_form = async (req, res) => {
         const doesStudentExist = await Student.findOne({ $or: [{ phone }, { email }] });
         if (doesStudentExist) {
             return res.status(400).json({ message: `This student already exists` });
-        } else if (stream != "eng" && stream != "mba" && stream != "phr" && stream != "libart") {
+        } else if (stream != "eng" && stream != "mba" && stream != "phr" && stream != "lba") {
             return res.status(400).json({ message: "Invalid stream" });
         }
 
@@ -35,7 +35,7 @@ const gate_form = async (req, res) => {
         });
         newStudent.logs.push({ entryTime: new Date() });
         await newStudent.save();
-        await sendMail(email, studId);
+        await sendWelcomeMail(email, studId);
         return res.status(201).json({ message: "Student registered successfully !", studId });
     } catch (err) {
         logd(err);

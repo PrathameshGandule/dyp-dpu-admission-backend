@@ -79,12 +79,46 @@ const getStudentById = async (req, res) => {
             stud = await Student.findById(studentId).select("studId firstname lastname phone email purpose stream gender");
         } else if (current_role == "desk2") {
             stud = await Student.findById(studentId).select("desk_updates.desk1.remarks");
-        } else if (current_role == "desk3"){
+        } else if (current_role == "desk3") {
             stud = await Student.findById(studentId).select("desk_updates.desk1.remarks desk_updates.desk2.remarks");
         } else {
             stud = await Student.findById(studentId);
         }
         return res.status(200).json(stud);
+    } catch (err) {
+        logd(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+function isValidDateString(dateStr) {
+    if (dateStr.length !== 7) return false;
+    const day = dateStr.slice(0, 2);
+    const month = dateStr.slice(2, 5);
+    const year = dateStr.slice(5, 7);
+    const validMonths = [
+        "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+        "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+    ];
+    const dayNum = Number(day);
+    const yearNum = Number(year);
+    if (Number.isNaN(dayNum) || dayNum < 1 || dayNum > 31) { return false }
+    if (!validMonths.includes(month)) { return false }
+    if (Number.isNaN(yearNum)) { return false }
+    return true;
+}
+
+
+const getStudentsFromDate = async (req, res) => {
+    try {
+        const dateString = req.params.date;
+        if (!isValidDateString(dateString)) {
+            return res.status(400).json({ message: "Invalid date" });
+        }
+        const students = await Student.find({
+            studId: { $regex: dateString }
+        }).lean();
+        return res.status(200).json(students);
     } catch (err) {
         logd(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -277,4 +311,12 @@ const updateDesk4 = async (req, res) => {
     }
 }
 
-export { getDeskNullStudents, getStudentById, updateDesk1, updateDesk2, updateDesk3, updateDesk4 };
+export { 
+    getDeskNullStudents, 
+    getStudentById, 
+    getStudentsFromDate,
+    updateDesk1, 
+    updateDesk2, 
+    updateDesk3, 
+    updateDesk4
+};
