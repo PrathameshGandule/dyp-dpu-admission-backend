@@ -1,6 +1,5 @@
 import jpkg from "jsonwebtoken";
 import bpkg from "bcryptjs";
-import { generate } from "generate-password";
 import { sendRegistrationMail } from "../utils/mailSender.js";
 import CollegeAuthority from "../models/CollegeAuthority.js";
 
