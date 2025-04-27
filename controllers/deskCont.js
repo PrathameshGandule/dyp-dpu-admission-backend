@@ -82,7 +82,7 @@ const getStudentById = async (req, res) => {
         } else if (current_role == "desk3") {
             stud = await Student.findById(studentId).select("desk_updates.desk1.remarks desk_updates.desk2.remarks");
         } else {
-            stud = await Student.findById(studentId);
+            stud = await Student.findById(studentId).lean();
         }
         return res.status(200).json(stud);
     } catch (err) {
@@ -117,7 +117,7 @@ const getStudentsFromDate = async (req, res) => {
         }
         const students = await Student.find({
             studId: { $regex: dateString }
-        }).lean();
+        }).select("firstname lastname studId stream").lean().exec();
         return res.status(200).json(students);
     } catch (err) {
         logd(err);
