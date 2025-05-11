@@ -1,4 +1,6 @@
 import Student from "../models/Student.js";
+import CollegeAuthority from "../models/CollegeAuthority.js"; // or correct relative path
+
 
 // const setStudent = async (req, res) => {
 //     try {
@@ -53,7 +55,7 @@ const getDeskNullStudents = async (req, res) => {
         const current_role = req.user.role;
 
         // Validate role before querying
-        if (!["desk1", "desk2", "desk3", "desk4"].includes(current_role)) {
+        if (!["desk1", "desk2", "desk3", "admin"].includes(current_role)) {
             return res.status(400).json({ message: "Invalid desk role" });
         }
 
@@ -108,22 +110,33 @@ function isValidDateString(dateStr) {
     return true;
 }
 
-
 const getStudentsFromDate = async (req, res) => {
     try {
-        const dateString = req.params.date;
-        if (!isValidDateString(dateString)) {
-            return res.status(400).json({ message: "Invalid date" });
+        let dateString = req.params.date;
+
+        // Handle "today" keyword
+        if (dateString.toLowerCase() === "today") {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, "0");
+            const month = now.toLocaleString("en-US", { month: "short" }).toUpperCase();
+            const year = String(now.getFullYear()).slice(2);
+            dateString = `${day}${month}${year}`; // e.g. "08MAY25"
         }
+
+        if (!isValidDateString(dateString)) {
+            return res.status(400).json({ message: "Invalid date format" });
+        }
+
         const students = await Student.find({
             studId: { $regex: dateString }
         }).select("firstname lastname studId stream").lean().exec();
+
         return res.status(200).json(students);
     } catch (err) {
-        logd(err);
+        console.error(err); // or use logd if it's a logger
         return res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
 
 const updateDesk1 = async (req, res) => {
     try {
@@ -311,12 +324,63 @@ const updateDesk4 = async (req, res) => {
     }
 }
 
-export { 
-    getDeskNullStudents, 
-    getStudentById, 
+const getStudentStats = async (req, res) => {
+    try {
+        // Get today's date in UTC and set it to midnight
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Get the total count of students
+        const totalCount = await Student.countDocuments();
+
+        // Get the count of students created today
+        const todayCount = await Student.countDocuments({
+            createdAt: { $gte: today }
+        });
+
+        // Return the total count and today's count
+        res.status(200).json({ total: totalCount, today: todayCount });
+    } catch (err) {
+        console.error(err);  // Log the error for debugging
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+const getStreamDistribution = async (req, res) => {
+    try {
+      const distribution = await Student.aggregate([
+        { $group: { _id: "$stream", count: { $sum: 1 } } }
+      ]);
+      res.status(200).json(distribution);
+    } catch (err) {
+      console.error("Stream aggregation error:", err);
+      res.status(500).json({ message: "Error fetching data" });
+    }
+  };
+  
+
+const getCounselorCount = async (req, res) => {
+    try {
+      const count = await CollegeAuthority.countDocuments({
+        type: { $in: ["gate", "desk1", "desk2", "desk3", "admin"] },
+      });
+      res.status(200).json({ count });
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+  
+
+
+export {
+    getDeskNullStudents,
+    getStudentById,
     getStudentsFromDate,
-    updateDesk1, 
-    updateDesk2, 
-    updateDesk3, 
-    updateDesk4
+    updateDesk1,
+    updateDesk2,
+    updateDesk3,
+    updateDesk4,
+    getStudentStats,
+    getStreamDistribution,
+    getCounselorCount
 };
