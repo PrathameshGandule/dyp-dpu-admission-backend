@@ -8,7 +8,7 @@ const collegeAuthoritySchema = new Schema({
     isLoginAllowed: { type: Boolean, default: true },
     otp: { type: String },
     timeForOperation: { type: Date },
-    type: { type: String, enum: ["gate", "desk1", "desk2", "desk3", "desk4"], required: true }
+    type: { type: String, enum: ["gate", "desk1", "desk2", "desk3", "admin"], required: true }
 }, { timestamps: true });
 
 export default model("CollegeAuthority", collegeAuthoritySchema);

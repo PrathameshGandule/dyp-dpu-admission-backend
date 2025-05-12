@@ -9,7 +9,7 @@ const studentSchema = new Schema({
     email: { type: String, required: true, unique: true },
     purpose: { type: String, enum: ["admission", "visit"], required: true }, // removed inquiry field
     stream: { type: String, enum: ["eng", "mba", "phr", "lba"], required: true }, // added new field liberal arts
-    currentDesk: { type: String, enum: ["desk1", "desk2", "desk3", "desk4", "completed"], default: "desk1" }, // added new desk4
+    currentDesk: { type: String, enum: ["desk1", "desk2", "desk3", "admin", "completed"], default: "desk1" }, // added new desk4
     visitors: { type: String, default: 0 },
     logs: [{
         entryTime: { type: Date, required: true },

@@ -12,7 +12,7 @@ const auth_register = async (req, res) => {
         if (!name || !email || !type) {
             return res.status(400).json({ message: "Fill all fields !" });
         }
-        const allowedTypes = ["gate", "desk1", "desk2", "desk3", "desk4"];
+        const allowedTypes = ["gate", "desk1", "desk2", "desk3", "admin"];
         if(!allowedTypes.includes(type)){
             return res.status(400).json({ message: "Invalid registration type" });
         }
