@@ -5,10 +5,11 @@ import cookieParser from "cookie-parser";
 import { configDotenv } from "dotenv"
 import connectDB from "./config/db.js"
 import './utils/logger.js'
-import checkCounters from "./utils/counterChecker.js";
+import { checkCounters , envChecker } from "./utils/checker.js";
 // import cookieParser from "cookie-parser";
 
 configDotenv()
+envChecker()
 const app = express();
 const PORT = process.env.PORT || 5000
 connectDB();
